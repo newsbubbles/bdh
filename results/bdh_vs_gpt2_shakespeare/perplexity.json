@@ -1,0 +1,46 @@
+[
+  {
+    "model_name": "bdh_best",
+    "dataset_name": "shakespeare",
+    "split": "val",
+    "perplexity": 4.275275818362365,
+    "loss": 1.452848619222641,
+    "tokens_evaluated": 20480,
+    "time_seconds": 3.7160966396331787,
+    "timestamp": "2026-01-08T18:38:53.281026",
+    "model_params": 25296896,
+    "model_config": {
+      "n_layer": 6,
+      "n_embd": 256,
+      "dropout": 0.1,
+      "n_head": 4,
+      "mlp_internal_dim_multiplier": 128,
+      "vocab_size": 256
+    },
+    "block_size": 256,
+    "batch_size": 4,
+    "device": "cuda"
+  },
+  {
+    "model_name": "gpt2",
+    "dataset_name": "shakespeare",
+    "split": "val",
+    "perplexity": 528.6846639074176,
+    "loss": 6.2703921556472775,
+    "tokens_evaluated": 20480,
+    "time_seconds": 1.7976195812225342,
+    "timestamp": "2026-01-08T18:39:28.870027",
+    "model_params": 124439808,
+    "model_config": {
+      "model_name": "gpt2",
+      "n_layer": 12,
+      "n_embd": 768,
+      "n_head": 12,
+      "vocab_size": 50257,
+      "n_params": 124000000
+    },
+    "block_size": 256,
+    "batch_size": 4,
+    "device": "cuda"
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "model": "BDH (best)",
+    "type": "byte-level",
+    "bpb": 1.7590606126661577,
+    "perplexity": 3.3847765897206026,
+    "loss": 1.219287904103597,
+    "tokens_evaluated": 30720,
+    "params": 25296896,
+    "bytes_in_text": 1115394
+  },
+  {
+    "model": "GPT-2 (gpt2)",
+    "type": "BPE",
+    "bpb": 0.3690404440591734,
+    "perplexity": 10803.921802205106,
+    "loss": 9.287664477030436,
+    "tokens_evaluated": 30720,
+    "params": 124439808,
+    "bytes_in_text": 1115394,
+    "bpe_tokens": 338025
+  }
+]

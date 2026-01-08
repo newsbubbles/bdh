@@ -1,1 +1,8 @@
 input.txt
+__pycache__/
+*.pyc
+memory/
+checkpoints/
+*.pt
+train_log.csv
+data/

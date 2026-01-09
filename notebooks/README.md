@@ -13,33 +13,33 @@ Hierarchical BDH extends the original BDH architecture with a **two-stage localâ
 ```mermaid
 flowchart TB
     subgraph Input["Input Sequence"]
-        bytes["Raw Bytes (B, T)"]
+        bytes["Raw Bytes<br/>(B, T)"]
     end
     
     subgraph Patching["Patch Embedding"]
-        reshape["Reshape into Patches\n(B, T/P, P)"]
-        patch_emb["Patch Embedding\n(B, T/P, d_model)"]
+        reshape["Reshape into Patches<br/>(B, T/P, P)"]
+        patch_emb["Patch Embedding<br/>(B, T/P, d_model)"]
     end
     
     subgraph Local["Local BDH Model"]
         direction TB
         local_in["Process within patches"]
-        local_attn["Block-Diagonal Attention\n(hypersparse, local context)"]
+        local_attn["Block-Diagonal Attention<br/>(hypersparse, local context)"]
         local_mlp["Hypersparse MLP"]
-        local_out["Local representations\n(B, T/P, P, d_local)"]
+        local_out["Local representations<br/>(B, T/P, P, d_local)"]
     end
     
     subgraph Global["Global BDH Model"]
         direction TB
         global_in["Cross-patch context"]
-        global_attn["Block-Diagonal Attention\n(hypersparse, global context)"]
+        global_attn["Block-Diagonal Attention<br/>(hypersparse, global context)"]
         global_mlp["Hypersparse MLP"]
-        global_out["Global representations\n(B, T/P, d_global)"]
+        global_out["Global representations<br/>(B, T/P, d_global)"]
     end
     
     subgraph Output["Output Head"]
         combine["Combine Local + Global"]
-        proj["Project to vocab\n(B, T, 256)"]
+        proj["Project to vocab<br/>(B, T, 256)"]
     end
     
     bytes --> reshape --> patch_emb

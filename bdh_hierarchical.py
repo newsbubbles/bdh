@@ -368,7 +368,13 @@ class GlobalModel(nn.Module):
 class LocalModel(nn.Module):
     """Local model operating on bytes within each patch.
     
-    Receives global context and refines byte-level predictions.
+    Receives global context from PREVIOUS patches (shifted by 1) to maintain
+    proper causal ordering. This prevents information leakage where bytes
+    could "see" future bytes through the global context.
+    
+    MEGABYTE-style causality:
+        - Bytes in patch 0 receive learned start embedding (no prior context)
+        - Bytes in patch i receive global context from patch i-1
     
     Shape:
         Input bytes: (B, T) 
@@ -385,6 +391,10 @@ class LocalModel(nn.Module):
         
         # Project global context to local dimension
         self.global_proj = nn.Linear(config.global_n_embd, config.local_n_embd, bias=False)
+        
+        # Learned embedding for first patch (no prior global context)
+        self.start_embed = nn.Parameter(torch.zeros(1, 1, config.local_n_embd))
+        nn.init.normal_(self.start_embed, std=0.02)
         
         # Position embedding within patch (0 to P-1)
         self.pos_embed = nn.Embedding(P, config.local_n_embd)
@@ -413,7 +423,10 @@ class LocalModel(nn.Module):
         self.ln_out = nn.LayerNorm(config.local_n_embd)
     
     def forward(self, x: torch.Tensor, global_ctx: torch.Tensor) -> torch.Tensor:
-        """Process bytes with global context.
+        """Process bytes with global context from PREVIOUS patches.
+        
+        Critical for causality: global context is shifted by 1 patch so that
+        bytes in patch i only see global information from patches 0..i-1.
         
         Args:
             x: (B, T) byte indices
@@ -432,16 +445,26 @@ class LocalModel(nn.Module):
         # Project global context: (B, num_patches, D_G) -> (B, num_patches, D_L)
         global_proj = self.global_proj(global_ctx)
         
-        # Expand global to byte level: (B, num_patches, D_L) -> (B, T, D_L)
-        # Each patch's global context is added to all bytes in that patch
-        global_expanded = global_proj.unsqueeze(2).expand(B, num_patches, P, D_L)
+        # CRITICAL FIX: Shift global context by 1 patch for causality
+        # - Patch 0 bytes get start_embed (no prior context)
+        # - Patch i bytes get global context from patch i-1
+        # Shape: (B, num_patches, D_L) -> (B, num_patches, D_L)
+        start_expanded = self.start_embed.expand(B, 1, D_L)  # (B, 1, D_L)
+        global_shifted = torch.cat([
+            start_expanded,           # First patch gets learned start embedding
+            global_proj[:, :-1, :]    # Remaining patches get previous patch's context
+        ], dim=1)  # (B, num_patches, D_L)
+        
+        # Expand shifted global to byte level: (B, num_patches, D_L) -> (B, T, D_L)
+        # Each patch's bytes receive the PREVIOUS patch's global context
+        global_expanded = global_shifted.unsqueeze(2).expand(B, num_patches, P, D_L)
         global_expanded = global_expanded.reshape(B, T, D_L)
         
         # Position within patch: (P,) -> (1, T, D_L)
         pos_ids = torch.arange(P, device=x.device).repeat(num_patches)
         pos_emb = self.pos_embed(pos_ids).unsqueeze(0)
         
-        # Combine: byte embedding + global context + position
+        # Combine: byte embedding + shifted global context + position
         h = byte_emb + global_expanded + pos_emb
         
         # Process through local layers

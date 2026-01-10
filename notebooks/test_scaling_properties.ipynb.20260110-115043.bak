@@ -59,7 +59,7 @@
     "    !rm -rf temp_bdh\n",
     "\n",
     "from bdh import BDH, BDHConfig\n",
-    "from bdh_hierarchical import HierarchicalBDH, HierarchicalBDHConfig\n",
+    "from hierarchical_bdh import HierarchicalBDH, HierarchicalBDHConfig\n",
     "print('Models loaded!')"
    ]
   },

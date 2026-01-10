@@ -334,7 +334,7 @@
     "\n",
     "def train_model(config_name, config, train_config):\n",
     "    \"\"\"Train a model and return metrics history\"\"\"\n",
-    "    print(f'\\n{\"=\"*60}')\n",
+    "    print(f'\\n{\"="*60}')\n",
     "    print(f'Training: {config_name}')\n",
     "    print(f'Layers: {config.n_layer}, Neurons: {compute_neurons(config):,}')\n",
     "    print('='*60)\n",

@@ -357,7 +357,7 @@
     "\n",
     "\n",
     "def train_model(name, config, get_batch_fn, train_config):\n",
-    "    print(f'\\n{\"=\"*60}')\n",
+    "    print(f'\\n{\"="*60}')\n",
     "    print(f'Training: {name}')\n",
     "    print(f'Vocab size: {config.vocab_size}')\n",
     "    print('='*60)\n",
